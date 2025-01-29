@@ -8,30 +8,13 @@ import (
 
 func echo(conn net.Conn) {
 
-	defer conn.Close()
-	body := make([]byte, 15*1024)
+	_, err := io.Copy(conn, conn)
+	if err != nil {
+		slog.Warn(err.Error(), "msg", "error while echoing")
+	}
 
-	for {
-		_, err := conn.Read(body)
-
-		if err != nil {
-
-			if err == io.EOF {
-				return
-			}
-			slog.Warn(err.Error(), "msg", "error while reading from connection")
-		}
-		slog.Info("received message => " + string(body))
-
-		_, err = conn.Write(body)
-		if err != nil {
-			slog.Warn(err.Error(), "msg", "error while writing to connection")
-		}
-
-		if err := conn.Close(); err != nil {
-			slog.Warn(err.Error(), "msg", "error while closing connection")
-
-		}
+	if err := conn.Close(); err != nil {
+		slog.Warn(err.Error(), "msg", "error while closing connection")
 	}
 
 }
