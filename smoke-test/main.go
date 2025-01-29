@@ -27,7 +27,7 @@ func echo(conn net.Conn) {
 }
 func main() {
 
-	listener, err := net.Listen("tcp", "127.0.0.1:8080")
+	listener, err := net.Listen("tcp", "0.0.0.0:8080")
 
 	if err != nil {
 		slog.Warn(err.Error(), "msg", "error while listening on port 8080")
