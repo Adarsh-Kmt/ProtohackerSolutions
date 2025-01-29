@@ -1,33 +1,43 @@
 package main
 
 import (
+	"io"
 	"log/slog"
 	"net"
 )
 
 func echo(conn net.Conn) {
 
-	body := make([]byte, 4096)
-	_, err := conn.Read(body)
+	defer conn.Close()
+	body := make([]byte, 15*1024)
 
-	if err != nil {
-		slog.Warn(err.Error(), "msg", "error while reading from connection")
+	for {
+		_, err := conn.Read(body)
+
+		if err != nil {
+
+			if err == io.EOF {
+				return
+			}
+			slog.Warn(err.Error(), "msg", "error while reading from connection")
+		}
+		slog.Info("received message => " + string(body))
+
+		_, err = conn.Write(body)
+		if err != nil {
+			slog.Warn(err.Error(), "msg", "error while writing to connection")
+		}
+
+		if err := conn.Close(); err != nil {
+			slog.Warn(err.Error(), "msg", "error while closing connection")
+
+		}
 	}
-	slog.Info("received message" + string(body))
 
-	_, err = conn.Write(body)
-	if err != nil {
-		slog.Warn(err.Error(), "msg", "error while writing to connection")
-	}
-
-	if err := conn.Close(); err != nil {
-		slog.Warn(err.Error(), "msg", "error while closing connection")
-
-	}
 }
 func main() {
 
-	listener, err := net.Listen("tcp", "127.0.0.1:8080")
+	listener, err := net.Listen("tcp", "0.0.0.0:8080")
 
 	if err != nil {
 		slog.Warn(err.Error(), "msg", "error while listening on port 8080")
