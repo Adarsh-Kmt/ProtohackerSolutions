@@ -7,7 +7,7 @@ import (
 
 func echo(conn net.Conn) {
 
-	body := make([]byte, 4096)
+	body := make([]byte, 15*1024)
 	_, err := conn.Read(body)
 
 	if err != nil {
