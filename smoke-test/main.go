@@ -18,6 +18,32 @@ func echo(conn net.Conn) {
 	}
 
 }
+
+func echo2(conn net.Conn) {
+
+	defer conn.Close()
+
+	for {
+
+		buf := make([]byte, 4096)
+
+		_, err := conn.Read(buf)
+
+		if err != nil {
+			slog.Error(err.Error(), "msg", "error while reading from connection")
+			if err == io.EOF {
+				return
+			}
+		}
+
+		_, err = conn.Write(buf)
+		if err != nil {
+			slog.Error(err.Error(), "msg", "error while writing to connection")
+		}
+
+	}
+
+}
 func main() {
 
 	listener, err := net.Listen("tcp", "0.0.0.0:8080")
@@ -28,14 +54,14 @@ func main() {
 	}
 
 	for {
-		slog.Info("waiting for connections")
+		//slog.Info("waiting for connections")
 		conn, err := listener.Accept()
-		slog.Info("connection accepted from source " + conn.RemoteAddr().String())
+		//slog.Info("connection accepted from source " + conn.RemoteAddr().String())
 		if err != nil {
 			slog.Warn(err.Error(), "msg", "error while establishing connection")
 			panic(err)
 		}
-		go echo(conn)
+		go echo2(conn)
 
 	}
 }
