@@ -34,12 +34,15 @@ func checkPrime(number int) Response {
 func ValidateRequest(request Request) bool {
 
 	if request.Method != "isPrime" {
+		slog.Error("invalid method signature")
 		return false
 	}
 	if request.Number < 0 {
+		slog.Error("negative number")
 		return false
 	}
 	if math.Ceil(request.Number) != request.Number {
+		slog.Error("float number")
 		return false
 	}
 
