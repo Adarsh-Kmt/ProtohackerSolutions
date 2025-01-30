@@ -20,7 +20,7 @@ type Response struct {
 
 func checkPrime(number int) Response {
 
-	if number == 1 {
+	if number <= 1 {
 		return Response{Method: "prime", Prime: false}
 	}
 	for i := 2; i <= int(math.Sqrt(float64(number))); i++ {
@@ -37,10 +37,7 @@ func ValidateRequest(request Request) bool {
 		slog.Error("invalid method signature")
 		return false
 	}
-	if request.Number < 0 {
-		slog.Error("negative number")
-		return false
-	}
+
 	if math.Ceil(request.Number) != request.Number {
 		slog.Error("float number")
 		return false
