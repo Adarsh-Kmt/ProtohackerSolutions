@@ -19,6 +19,9 @@ type Response struct {
 
 func checkPrime(number int) Response {
 
+	if number == 1 {
+		return Response{Method: "prime", Prime: false}
+	}
 	for i := 2; i <= int(math.Sqrt(float64(number))); i++ {
 		if number%i == 0 {
 			return Response{Method: "isPrime", Prime: false}
