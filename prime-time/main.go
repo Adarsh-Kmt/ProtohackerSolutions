@@ -50,13 +50,21 @@ func handle(conn net.Conn) {
 
 	for {
 
+		buf := make([]byte, 4096)
+
+		n, err := conn.Read(buf)
+		if err != nil {
+			slog.Error(err.Error(), "msg", "error while reading from connection")
+			return
+		}
+		log.Println("content sent " + string(buf[:n]))
 		var request Request
-		if err := json.NewDecoder(conn).Decode(&request); err != nil {
+		if err := json.NewDecoder(bytes.NewBuffer(buf[:n])).Decode(&request); err != nil {
+			slog.Error(err.Error(), "msg", "error while decoding from connection")
 			if _, err := conn.Write([]byte("malformed")); err != nil {
 				slog.Error(err.Error(), "msg", "error while writing malformed request to connection")
 
 			}
-			slog.Error(err.Error(), "msg", "error while decoding from connection")
 			return
 		}
 		log.Println(request)
