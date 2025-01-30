@@ -52,6 +52,10 @@ func handle(conn net.Conn) {
 
 		var request Request
 		if err := json.NewDecoder(conn).Decode(&request); err != nil {
+			if _, err := conn.Write([]byte("malformed")); err != nil {
+				slog.Error(err.Error(), "msg", "error while writing malformed request to connection")
+
+			}
 			slog.Error(err.Error(), "msg", "error while decoding from connection")
 			return
 		}
