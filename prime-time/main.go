@@ -54,7 +54,7 @@ func handle(conn net.Conn) {
 			slog.Error(err.Error(), "msg", "error while decoding from connection")
 			return
 		}
-
+		log.Println(request)
 		if !ValidateRequest(request) {
 			if _, err := conn.Write([]byte("malformed")); err != nil {
 				slog.Error(err.Error(), "msg", "error while writing malformed request to connection")
