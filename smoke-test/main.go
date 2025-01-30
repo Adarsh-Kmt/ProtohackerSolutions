@@ -27,7 +27,7 @@ func echo2(conn net.Conn) {
 
 		buf := make([]byte, 4096)
 
-		_, err := conn.Read(buf)
+		n, err := conn.Read(buf)
 
 		if err != nil {
 			slog.Error(err.Error(), "msg", "error while reading from connection")
@@ -36,7 +36,7 @@ func echo2(conn net.Conn) {
 			}
 		}
 
-		_, err = conn.Write(buf)
+		_, err = conn.Write(buf[:n])
 		if err != nil {
 			slog.Error(err.Error(), "msg", "error while writing to connection")
 		}
