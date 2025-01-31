@@ -21,7 +21,7 @@ type Response struct {
 
 func checkPrime(n int) Response {
 	if n <= 3 {
-		if n == 1{
+		if n <= 1{
 			return Response{Method: "isPrime", Prime: false}
 		} else {
 			return Response{Method: "isPrime", Prime: true}
