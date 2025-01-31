@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"io"
 	"log/slog"
 	"math"
@@ -27,7 +26,7 @@ func checkPrime(n int) Response {
 		return Response{Method: "isPrime", Prime: false}
 	}
 
-	for i := 2; i <= int(math.Sqrt(float64(n))); i++ {
+	for i := 2; i*i <= n; i++ {
 
 		if n%i == 0 {
 			return Response{Method: "isPrime", Prime: false}
@@ -79,9 +78,9 @@ func handle(conn net.Conn, mutex *sync.Mutex, clientId int) {
 			}
 			return
 		}
-		mutex.Lock()
-		slog.Info(fmt.Sprintf("%v", request), "client-id", clientId)
-		mutex.Unlock()
+		//mutex.Lock()
+		//slog.Info(fmt.Sprintf("%v", request), "client-id", clientId)
+		//mutex.Unlock()
 
 		if !ValidateRequest(request) {
 			if _, err := conn.Write([]byte("malformed")); err != nil {
