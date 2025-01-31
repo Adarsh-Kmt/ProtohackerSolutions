@@ -19,7 +19,7 @@ type Response struct {
 	Prime  bool   `json:"prime"`
 }
 
-func checkPrime(n int) bool {
+func checkPrime(n int) Response {
 	if n <= 3 {
 		if n == 1{
 			return Response{Method: "isPrime", Prime: false}
