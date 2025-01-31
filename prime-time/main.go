@@ -3,10 +3,12 @@ package main
 import (
 	"bytes"
 	"encoding/json"
-	"log"
+	"fmt"
+	"io"
 	"log/slog"
 	"math"
 	"net"
+	"sync"
 )
 
 type Request struct {
@@ -20,18 +22,14 @@ type Response struct {
 }
 
 func checkPrime(n int) Response {
-	if n <= 3 {
-		if n <= 1{
-			return Response{Method: "isPrime", Prime: false}
-		} else {
-			return Response{Method: "isPrime", Prime: true}
-		}
-	} else if n%2 == 0 || n%3 == 0 {
+
+	if n <= 1 {
 		return Response{Method: "isPrime", Prime: false}
 	}
 
-	for i := 5; i*i <= n; i += 6 {
-		if n%i == 0 || n%(i+2) == 0 {
+	for i := 2; i <= int(math.Sqrt(float64(n))); i++ {
+
+		if n%i == 0 {
 			return Response{Method: "isPrime", Prime: false}
 		}
 	}
@@ -53,7 +51,7 @@ func ValidateRequest(request Request) bool {
 
 	return true
 }
-func handle(conn net.Conn) {
+func handle(conn net.Conn, mutex *sync.Mutex, clientId int) {
 	defer conn.Close()
 
 	for {
@@ -62,10 +60,16 @@ func handle(conn net.Conn) {
 
 		n, err := conn.Read(buf)
 		if err != nil {
-			slog.Error(err.Error(), "msg", "error while reading from connection")
+			if err != io.EOF {
+				slog.Error(err.Error(), "client-id", clientId, "msg", "error while reading from connection")
+			}
 			return
 		}
-		log.Println("content sent " + string(buf[:n]))
+
+		mutex.Lock()
+		slog.Info("content sent "+string(buf[:n]), "client-id", clientId)
+		mutex.Unlock()
+
 		var request Request
 		if err := json.NewDecoder(bytes.NewBuffer(buf[:n])).Decode(&request); err != nil {
 			slog.Error(err.Error(), "msg", "error while decoding from connection")
@@ -75,11 +79,13 @@ func handle(conn net.Conn) {
 			}
 			return
 		}
-		log.Println(request)
+		mutex.Lock()
+		slog.Info(fmt.Sprintf("%v", request), "client-id", clientId)
+		mutex.Unlock()
+
 		if !ValidateRequest(request) {
 			if _, err := conn.Write([]byte("malformed")); err != nil {
 				slog.Error(err.Error(), "msg", "error while writing malformed request to connection")
-
 			}
 			return
 		}
@@ -96,6 +102,10 @@ func main() {
 
 	listener, err := net.Listen("tcp", "0.0.0.0:8080")
 
+	mutex := &sync.Mutex{}
+	idMutex := &sync.Mutex{}
+
+	id := 0
 	if err != nil {
 		slog.Warn(err.Error(), "msg", "error while listening on port 8080")
 		panic(err)
@@ -108,6 +118,11 @@ func main() {
 			panic(err)
 		}
 
-		go handle(conn)
+		idMutex.Lock()
+		id++
+		localId := id
+		idMutex.Unlock()
+
+		go handle(conn, mutex, localId)
 	}
 }
