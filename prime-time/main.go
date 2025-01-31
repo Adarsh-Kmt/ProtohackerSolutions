@@ -24,7 +24,7 @@ func checkPrime(n int) Response {
 		if n == 1{
 			return Response{Method: "isPrime", Prime: false}
 		} else {
-			Response{Method: "isPrime", Prime: true}
+			return Response{Method: "isPrime", Prime: true}
 		}
 	} else if n%2 == 0 || n%3 == 0 {
 		return Response{Method: "isPrime", Prime: false}
