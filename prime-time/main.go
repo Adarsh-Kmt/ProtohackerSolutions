@@ -20,16 +20,21 @@ type Response struct {
 	Prime  bool   `json:"prime"`
 }
 
-func checkPrime(n int64) Response {
+func checkPrime(n float64) Response {
 
-	if n <= 1 {
+	if math.Ceil(n) != n {
+		return Response{Method: "isPrime", Prime: false}
+	}
+
+	m := int64(n)
+	if m <= 1 {
 		return Response{Method: "isPrime", Prime: false}
 	}
 
 	var i int64
-	for i = 2; i*i <= n; i++ {
+	for i = 2; i*i <= m; i++ {
 
-		if n%i == 0 {
+		if m%i == 0 {
 			return Response{Method: "isPrime", Prime: false}
 		}
 	}
@@ -41,11 +46,6 @@ func ValidateRequest(request Request) bool {
 
 	if request.Method != "isPrime" {
 		slog.Error("invalid method signature")
-		return false
-	}
-
-	if math.Ceil(*request.Number) != *request.Number {
-		slog.Error("float number")
 		return false
 	}
 
@@ -93,7 +93,7 @@ func handle(conn net.Conn, mutex *sync.Mutex, clientId int) {
 			return
 		}
 
-		response := checkPrime(int64(*request.Number))
+		response := checkPrime(*request.Number)
 		if err := json.NewEncoder(conn).Encode(response); err != nil {
 			slog.Error(err.Error(), "msg", "error while encoding response to connection")
 			return

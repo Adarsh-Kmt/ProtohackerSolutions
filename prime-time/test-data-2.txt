@@ -1,1 +1,2 @@
-{"method":"isPrime", "number":2.9465963e+7}
+{"method":"isPrime", "number":2.9}
+
