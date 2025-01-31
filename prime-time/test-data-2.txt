@@ -1,1 +1,1 @@
-{"method":"lol", "number":5}
+{"method":"isPrime", "number":2.9465963e+7}

@@ -1,9 +1,9 @@
 package main
 
 import (
+	"bufio"
 	"bytes"
 	"encoding/json"
-	"io"
 	"log/slog"
 	"math"
 	"net"
@@ -20,13 +20,14 @@ type Response struct {
 	Prime  bool   `json:"prime"`
 }
 
-func checkPrime(n int) Response {
+func checkPrime(n int64) Response {
 
 	if n <= 1 {
 		return Response{Method: "isPrime", Prime: false}
 	}
 
-	for i := 2; i*i <= n; i++ {
+	var i int64
+	for i = 2; i*i <= n; i++ {
 
 		if n%i == 0 {
 			return Response{Method: "isPrime", Prime: false}
@@ -53,24 +54,21 @@ func ValidateRequest(request Request) bool {
 func handle(conn net.Conn, mutex *sync.Mutex, clientId int) {
 	defer conn.Close()
 
+	reader := bufio.NewReader(conn)
 	for {
 
-		buf := make([]byte, 4096)
-
-		n, err := conn.Read(buf)
+		requestString, err := reader.ReadString('\n')
 		if err != nil {
-			if err != io.EOF {
-				slog.Error(err.Error(), "client-id", clientId, "msg", "error while reading from connection")
-			}
+			slog.Error(err.Error(), "client-id", clientId, "msg", "error while reading from connection")
 			return
 		}
 
 		mutex.Lock()
-		slog.Info("content sent "+string(buf[:n]), "client-id", clientId)
+		slog.Info("content sent "+requestString, "client-id", clientId)
 		mutex.Unlock()
 
 		var request Request
-		if err := json.NewDecoder(bytes.NewBuffer(buf[:n])).Decode(&request); err != nil {
+		if err := json.NewDecoder(bytes.NewBuffer([]byte(requestString))).Decode(&request); err != nil {
 			slog.Error(err.Error(), "msg", "error while decoding from connection")
 			if _, err := conn.Write([]byte("malformed")); err != nil {
 				slog.Error(err.Error(), "msg", "error while writing malformed request to connection")
@@ -89,7 +87,7 @@ func handle(conn net.Conn, mutex *sync.Mutex, clientId int) {
 			return
 		}
 
-		response := checkPrime(int(request.Number))
+		response := checkPrime(int64(request.Number))
 		if err := json.NewEncoder(conn).Encode(response); err != nil {
 			slog.Error(err.Error(), "msg", "error while encoding response to connection")
 			return
