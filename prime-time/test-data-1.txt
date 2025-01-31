@@ -1,1 +1,1 @@
-{"method":"isPrime", "number":5}
+{"method":"isPrime"}

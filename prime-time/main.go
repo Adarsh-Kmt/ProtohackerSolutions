@@ -11,8 +11,8 @@ import (
 )
 
 type Request struct {
-	Method string  `json:"method"`
-	Number float64 `json:"number"`
+	Method string   `json:"method"`
+	Number *float64 `json:"number"`
 }
 
 type Response struct {
@@ -44,7 +44,7 @@ func ValidateRequest(request Request) bool {
 		return false
 	}
 
-	if math.Ceil(request.Number) != request.Number {
+	if math.Ceil(*request.Number) != *request.Number {
 		slog.Error("float number")
 		return false
 	}
@@ -75,6 +75,12 @@ func handle(conn net.Conn, mutex *sync.Mutex, clientId int) {
 
 			}
 			return
+		} else if request.Number == nil {
+			if _, err := conn.Write([]byte("malformed")); err != nil {
+				slog.Error(err.Error(), "msg", "error while writing malformed request to connection")
+
+			}
+			return
 		}
 		//mutex.Lock()
 		//slog.Info(fmt.Sprintf("%v", request), "client-id", clientId)
@@ -87,7 +93,7 @@ func handle(conn net.Conn, mutex *sync.Mutex, clientId int) {
 			return
 		}
 
-		response := checkPrime(int64(request.Number))
+		response := checkPrime(int64(*request.Number))
 		if err := json.NewEncoder(conn).Encode(response); err != nil {
 			slog.Error(err.Error(), "msg", "error while encoding response to connection")
 			return
