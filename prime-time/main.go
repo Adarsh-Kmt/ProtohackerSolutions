@@ -19,20 +19,24 @@ type Response struct {
 	Prime  bool   `json:"prime"`
 }
 
-func isPrime(n int) bool {
+func checkPrime(n int) bool {
 	if n <= 3 {
-		return n > 1
+		if n == 1{
+			return Response{Method: "isPrime", Prime: false}
+		} else {
+			Response{Method: "isPrime", Prime: true}
+		}
 	} else if n%2 == 0 || n%3 == 0 {
-		return false
+		return Response{Method: "isPrime", Prime: false}
 	}
 
 	for i := 5; i*i <= n; i += 6 {
 		if n%i == 0 || n%(i+2) == 0 {
-			return false
+			return Response{Method: "isPrime", Prime: false}
 		}
 	}
 
-	return true
+	return Response{Method: "isPrime", Prime: true}
 }
 
 func ValidateRequest(request Request) bool {
