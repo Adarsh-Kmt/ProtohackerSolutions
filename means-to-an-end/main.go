@@ -6,7 +6,6 @@ import (
 	"encoding/binary"
 	"fmt"
 	"github.com/zavitax/sortedset-go"
-	"io"
 	"log/slog"
 	"math"
 	"net"
@@ -86,9 +85,7 @@ func handleClient(conn net.Conn, clientId int) {
 			b, err := reader.ReadByte()
 			slog.Info(fmt.Sprintf("received byte %b", b))
 			if err != nil {
-				if err != io.EOF {
-					return
-				}
+				return
 			}
 			buf = append(buf, b)
 		}
