@@ -53,9 +53,9 @@ func handleQueryRequest(sortedSet *sortedset.SortedSet[int32, int32, int32], req
 		//slog.Error("minTime > maxTime")
 		return 0
 	}
-	var sum int32 = 0
+	var sum int64 = 0
 	for _, node := range nodes {
-		sum += node.Value
+		sum += int64(node.Value)
 	}
 	//slog.Info(fmt.Sprintf("sum: %d", sum))
 	mean = int32(math.Ceil(float64(sum) / float64(len(nodes))))
