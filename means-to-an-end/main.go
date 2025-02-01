@@ -45,7 +45,7 @@ func handleInsertRequest(sortedSet *sortedset.SortedSet[int32, int32, int32], re
 
 func handleQueryRequest(sortedSet *sortedset.SortedSet[int32, int32, int32], request *QueryRequest) (mean int32) {
 
-	nodes := sortedSet.GetRangeByRank(int(request.minTime), int(request.maxTime), false)
+	nodes := sortedSet.GetRangeByScore(request.minTime, request.maxTime, nil)
 
 	if len(nodes) == 0 {
 		slog.Error("no matching nodes")
