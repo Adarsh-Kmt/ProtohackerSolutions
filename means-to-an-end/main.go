@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"bytes"
 	"encoding/binary"
-	"fmt"
 	"github.com/zavitax/sortedset-go"
 	"log/slog"
 	"math"
@@ -40,7 +39,7 @@ func parseInsertRequest(buf []byte) (*InsertRequest, error) {
 func handleInsertRequest(sortedSet *sortedset.SortedSet[int32, int32, int32], request *InsertRequest) {
 
 	sortedSet.AddOrUpdate(request.timestamp, request.timestamp, request.price)
-	slog.Info(fmt.Sprintf("number of elements in the sorted set %d", sortedSet.GetCount()))
+	//slog.Info(fmt.Sprintf("number of elements in the sorted set %d", sortedSet.GetCount()))
 }
 
 func handleQueryRequest(sortedSet *sortedset.SortedSet[int32, int32, int32], request *QueryRequest) (mean int32) {
@@ -48,17 +47,17 @@ func handleQueryRequest(sortedSet *sortedset.SortedSet[int32, int32, int32], req
 	nodes := sortedSet.GetRangeByScore(request.minTime, request.maxTime, nil)
 
 	if len(nodes) == 0 {
-		slog.Error("no matching nodes")
+		//slog.Error("no matching nodes")
 		return 0
 	} else if request.minTime > request.maxTime {
-		slog.Error("minTime > maxTime")
+		//slog.Error("minTime > maxTime")
 		return 0
 	}
 	var sum int32 = 0
 	for _, node := range nodes {
 		sum += node.Value
 	}
-	slog.Info(fmt.Sprintf("sum: %d", sum))
+	//slog.Info(fmt.Sprintf("sum: %d", sum))
 	mean = int32(math.Ceil(float64(sum) / float64(len(nodes))))
 	return mean
 }
@@ -87,23 +86,24 @@ func handleClient(conn net.Conn, clientId int) {
 
 		for i := 0; i < 9; i++ {
 			b, err := reader.ReadByte()
-			slog.Info(fmt.Sprintf("received byte %b", b))
+			//slog.Info(fmt.Sprintf("received byte %b", b))
 			if err != nil {
 				return
 			}
 			buf = append(buf, b)
 		}
 
-		slog.Info(fmt.Sprintf("%v", buf))
+		//slog.Info(fmt.Sprintf("%v", buf))
 
 		if int(buf[0]) == int('I') {
 			request, err := parseInsertRequest(buf)
 			if err != nil {
 				slog.Error(err.Error(), clientId, "client-id", clientId, "msg", "error while parsing insert request")
 				return
-			} else {
-				slog.Info(fmt.Sprintf("received insert request: %v", request), "client-id", clientId)
 			}
+			//} else {
+			//	slog.Info(fmt.Sprintf("received insert request: %v", request), "client-id", clientId)
+			//}
 			handleInsertRequest(sortedSet, request)
 
 		} else if int(buf[0]) == int('Q') {
@@ -111,9 +111,10 @@ func handleClient(conn net.Conn, clientId int) {
 			if err != nil {
 				slog.Error(err.Error(), clientId, "client-id", clientId, "msg", "error while parsing query request")
 				return
-			} else {
-				slog.Info(fmt.Sprintf("received query request: %v", request), "client-id", clientId)
 			}
+			//else {
+			//	slog.Info(fmt.Sprintf("received query request: %v", request), "client-id", clientId)
+			//}
 
 			mean := handleQueryRequest(sortedSet, request)
 
