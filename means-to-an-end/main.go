@@ -48,6 +48,9 @@ func handleQueryRequest(sortedSet *sortedset.SortedSet[int32, int32, int32], req
 
 	nodes := sortedSet.GetRangeByRank(int(request.minTime), int(request.maxTime), false)
 
+	if len(nodes) == 0 || request.minTime > request.maxTime {
+		return 0
+	}
 	var sum int32 = 0
 	for _, node := range nodes {
 		sum += node.Value
@@ -110,6 +113,7 @@ func handleClient(conn net.Conn, clientId int) {
 			} else {
 				slog.Info(fmt.Sprintf("received query request: %v", request), "client-id", clientId)
 			}
+
 			mean := handleQueryRequest(sortedSet, request)
 
 			if err = binary.Write(conn, binary.BigEndian, mean); err != nil {
