@@ -92,7 +92,7 @@ func handleClient(conn net.Conn, clientId int) {
 
 		var command int32
 		if err := binary.Read(bytes.NewBuffer(buf[0:1]), binary.BigEndian, &command); err != nil {
-			slog.Error(err.Error(), "client-id", clientId, "msg", "error while reading from connection")
+			slog.Error(err.Error(), "client-id", clientId, "msg", "error while decoding command")
 			return
 		} else {
 			slog.Info(fmt.Sprintf("received command %d", command), "client-id", clientId)
