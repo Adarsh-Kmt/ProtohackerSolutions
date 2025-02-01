@@ -1,10 +1,12 @@
 package main
 
 import (
+	"bufio"
 	"bytes"
 	"encoding/binary"
 	"fmt"
 	"github.com/zavitax/sortedset-go"
+	"io"
 	"log/slog"
 	"math"
 	"net"
@@ -72,24 +74,19 @@ func handleClient(conn net.Conn, clientId int) {
 
 	sortedSet := sortedset.New[int32, int32, int32]()
 
+	reader := bufio.NewReader(conn)
 	for {
 
-		buf := make([]byte, 9)
+		buf := make([]byte, 0)
 
-		bytesRead := 0
-
-		for bytesRead < 9 {
-			n, err := conn.Read(buf[bytesRead:])
+		for i := 0; i < 9; i++ {
+			b, err := reader.ReadByte()
 			if err != nil {
-				slog.Error(err.Error(), "client-id", clientId, "msg", "error while reading from connection")
-
-				if bytesRead == 0 {
+				if err != io.EOF {
 					return
-				} else {
-					break
 				}
 			}
-			bytesRead += n
+			buf = append(buf, b)
 		}
 
 		var command int32
