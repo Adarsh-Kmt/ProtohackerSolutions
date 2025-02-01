@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/binary"
+	"fmt"
 	"github.com/zavitax/sortedset-go"
 	"log/slog"
 	"math"
@@ -86,6 +87,8 @@ func handleClient(conn net.Conn, clientId int) {
 		if err := binary.Read(bytes.NewBuffer(buf[0:1]), binary.BigEndian, &command); err != nil {
 			slog.Error(err.Error(), "client-id", clientId, "msg", "error while reading from connection")
 			return
+		} else {
+			slog.Info(fmt.Sprintf("received command %d", command), "client-id", clientId)
 		}
 
 		if command == int32('I') {
@@ -93,6 +96,8 @@ func handleClient(conn net.Conn, clientId int) {
 			if err != nil {
 				slog.Error(err.Error(), clientId, "client-id", clientId, "msg", "error while parsing insert request")
 				return
+			} else {
+				slog.Info(fmt.Sprintf("received insert request: %v", request), "client-id", clientId)
 			}
 			handleInsertRequest(sortedSet, request)
 
@@ -101,6 +106,8 @@ func handleClient(conn net.Conn, clientId int) {
 			if err != nil {
 				slog.Error(err.Error(), clientId, "client-id", clientId, "msg", "error while parsing query request")
 				return
+			} else {
+				slog.Info(fmt.Sprintf("received query request: %v", request), "client-id", clientId)
 			}
 			mean := handleQueryRequest(sortedSet, request)
 
