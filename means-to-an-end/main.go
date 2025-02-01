@@ -82,7 +82,12 @@ func handleClient(conn net.Conn, clientId int) {
 			n, err := conn.Read(buf[bytesRead:])
 			if err != nil {
 				slog.Error(err.Error(), "client-id", clientId, "msg", "error while reading from connection")
-				return
+
+				if bytesRead == 0 {
+					return
+				} else {
+					break
+				}
 			}
 			bytesRead += n
 		}
