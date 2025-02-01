@@ -90,6 +90,7 @@ func handleClient(conn net.Conn, clientId int) {
 			buf = append(buf, b)
 		}
 
+		slog.Info(fmt.Sprintf("%v", buf))
 		var command int32
 		if err := binary.Read(bytes.NewBuffer(buf[0:1]), binary.BigEndian, &command); err != nil {
 			slog.Error(err.Error(), "client-id", clientId, "msg", "error while decoding command")
