@@ -84,12 +84,14 @@ func handleClient(conn net.Conn, clientId int) {
 
 		var command int
 		if err := binary.Read(bytes.NewBuffer(buf[0:1]), binary.BigEndian, &command); err != nil {
+			slog.Error(err.Error(), "client-id", clientId, "msg", "error while reading from connection")
 			return
 		}
 
 		if command == int('I') {
 			request, err := parseInsertRequest(buf)
 			if err != nil {
+				slog.Error(err.Error(), clientId, "client-id", clientId, "msg", "error while parsing insert request")
 				return
 			}
 			handleInsertRequest(sortedSet, request)
@@ -97,6 +99,7 @@ func handleClient(conn net.Conn, clientId int) {
 		} else if command == int('Q') {
 			request, err := parseQueryRequest(buf)
 			if err != nil {
+				slog.Error(err.Error(), clientId, "client-id", clientId, "msg", "error while parsing query request")
 				return
 			}
 			mean := handleQueryRequest(sortedSet, request)
