@@ -76,11 +76,15 @@ func handleClient(conn net.Conn, clientId int) {
 
 		buf := make([]byte, 9)
 
-		_, err := conn.Read(buf)
+		bytesRead := 0
 
-		if err != nil {
-			slog.Error(err.Error(), "client-id", clientId, "msg", "error while reading from connection")
-			return
+		for bytesRead < 9 {
+			n, err := conn.Read(buf[bytesRead:])
+			if err != nil {
+				slog.Error(err.Error(), "client-id", clientId, "msg", "error while reading from connection")
+				return
+			}
+			bytesRead += n
 		}
 
 		var command int32
