@@ -76,6 +76,7 @@ func handleClient(conn net.Conn, clientId int) {
 		buf := make([]byte, 9)
 
 		_, err := conn.Read(buf)
+
 		if err != nil {
 			slog.Error(err.Error(), "client-id", clientId, "msg", "error while reading from connection")
 			return
@@ -119,6 +120,8 @@ func main() {
 	if err != nil {
 		slog.Warn(err.Error(), "msg", "error while listening on port 8080")
 		return
+	} else {
+		slog.Info("Listening on port 8080")
 	}
 
 	for {
@@ -126,6 +129,8 @@ func main() {
 		if err != nil {
 			slog.Warn(err.Error(), "msg", "error while accepting connection")
 			return
+		} else {
+			slog.Info("connection established!")
 		}
 
 		clientIdMutex.Lock()
