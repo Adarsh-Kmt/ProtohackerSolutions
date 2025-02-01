@@ -40,7 +40,7 @@ func parseInsertRequest(buf []byte) (*InsertRequest, error) {
 func handleInsertRequest(sortedSet *sortedset.SortedSet[int32, int32, int32], request *InsertRequest) {
 
 	sortedSet.AddOrUpdate(request.timestamp, request.timestamp, request.price)
-
+	slog.Info(fmt.Sprintf("number of elements in the sorted set %d", sortedSet.GetCount()))
 }
 
 func handleQueryRequest(sortedSet *sortedset.SortedSet[int32, int32, int32], request *QueryRequest) (mean int32) {
