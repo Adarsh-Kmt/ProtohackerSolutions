@@ -54,7 +54,7 @@ func handleQueryRequest(sortedSet *sortedset.SortedSet[int32, int32, int32], req
 	for _, node := range nodes {
 		sum += node.Value
 	}
-
+	slog.Info(fmt.Sprintf("sum: %d", sum))
 	mean = int32(math.Ceil(float64(sum) / float64(len(nodes))))
 	return mean
 }
