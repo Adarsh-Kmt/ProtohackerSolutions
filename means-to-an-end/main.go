@@ -83,7 +83,7 @@ func handleClient(conn net.Conn, clientId int) {
 			b, err := reader.ReadByte()
 			slog.Info(fmt.Sprintf("received byte %b", b))
 			if err != nil {
-				if err == io.EOF {
+				if err != io.EOF && i == 0 {
 					return
 				}
 			}
