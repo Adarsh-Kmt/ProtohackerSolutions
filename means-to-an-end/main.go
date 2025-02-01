@@ -47,7 +47,11 @@ func handleQueryRequest(sortedSet *sortedset.SortedSet[int32, int32, int32], req
 
 	nodes := sortedSet.GetRangeByRank(int(request.minTime), int(request.maxTime), false)
 
-	if len(nodes) == 0 || request.minTime > request.maxTime {
+	if len(nodes) == 0 {
+		slog.Error("no matching nodes")
+		return 0
+	} else if request.minTime > request.maxTime {
+		slog.Error("minTime > maxTime")
 		return 0
 	}
 	var sum int32 = 0
