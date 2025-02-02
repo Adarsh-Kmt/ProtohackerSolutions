@@ -106,7 +106,7 @@ func (chat *BudgetChat) broadcastPresenceNotification(name string) error {
 	usersOnlineNotification := onlineUsersMessageFormat
 
 	userJoinedMessage := fmt.Sprintf(userJoinedMessageFormat, name)
-
+	slog.Info("broadcasting message " + userJoinedMessage)
 	chat.clientsMutex.RLock()
 
 	for username, _ := range chat.clients {
