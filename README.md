@@ -1,2 +1,2 @@
 # ProtohackerSolutions
-Solutions to protohacker challenges.
+Solutions to [Protohacker Challenges](https://protohackers.com/).
