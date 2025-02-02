@@ -179,6 +179,7 @@ func (chat *BudgetChat) handleClient(conn net.Conn) {
 	name, err := chat.setName(conn)
 
 	if err != nil {
+		_, _ = conn.Write([]byte("invalid name \n"))
 		return
 	}
 
