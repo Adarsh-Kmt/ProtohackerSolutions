@@ -181,6 +181,8 @@ func (chat *BudgetChat) handleClient(conn net.Conn) {
 	if err != nil {
 		_, _ = conn.Write([]byte("invalid name \n"))
 		return
+	} else {
+		slog.Info(name + " has connected to budget chat.")
 	}
 
 	if err := chat.broadcastPresenceNotification(name); err != nil {
