@@ -12,6 +12,7 @@ const (
 	welcomeMessageFormat     = "Welcome to budget-chat! what do we call you?\n"
 	userMessageFormat        = "[%s] %s\n"
 	userJoinedMessageFormat  = "* %s has joined the chat.\n"
+	userExitedMessageFormat  = "* %s has exited the chat.\n"
 	onlineUsersMessageFormat = "* online users: "
 )
 
@@ -155,7 +156,7 @@ func (chat *BudgetChat) handleUserExit(name string) error {
 
 	chat.clientsMutex.Unlock()
 
-	userExitMessage := "* " + name + " has left the chat."
+	userExitMessage := fmt.Sprintf(userExitedMessageFormat, name)
 	slog.Info(userExitMessage)
 	if err := chat.broadcastData(name, []byte(userExitMessage)); err != nil {
 		return err
