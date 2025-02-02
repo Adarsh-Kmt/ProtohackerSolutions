@@ -9,9 +9,9 @@ import (
 )
 
 const (
-	welcomeMessageFormat     = "Welcome to budget-chat! what do we call you?"
-	userMessageFormat        = "[%s] %s"
-	userJoinedMessageFormat  = "* %s has joined the chat."
+	welcomeMessageFormat     = "Welcome to budget-chat! what do we call you?\n"
+	userMessageFormat        = "[%s] %s\n"
+	userJoinedMessageFormat  = "* %s has joined the chat.\n"
 	onlineUsersMessageFormat = "* online users: "
 )
 
@@ -113,7 +113,7 @@ func (chat *BudgetChat) broadcastPresenceNotification(name string) error {
 			usersOnlineNotification = username + ", " + usersOnlineNotification
 		}
 	}
-
+	usersOnlineNotification = usersOnlineNotification + "\n"
 	chat.clientsMutex.RUnlock()
 
 	if err := chat.broadcastData(name, []byte(userJoinedMessage)); err != nil {
