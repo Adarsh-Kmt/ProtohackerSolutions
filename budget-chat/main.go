@@ -111,7 +111,7 @@ func (chat *BudgetChat) broadcastPresenceNotification(name string) error {
 
 	for username, _ := range chat.clients {
 		if username != name {
-			usersOnlineNotification = username + ", " + usersOnlineNotification
+			usersOnlineNotification = usersOnlineNotification + username + ", "
 		}
 	}
 	usersOnlineNotification = usersOnlineNotification + "\n"
