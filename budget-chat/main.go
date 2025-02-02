@@ -65,6 +65,7 @@ func (chat *BudgetChat) setName(conn net.Conn) (name string, err error) {
 		return "", fmt.Errorf("user with name " + name + " is not a valid name.")
 	}
 
+	slog.Info("user has chosen name " + name)
 	chat.clients[name] = conn
 	chat.connMutexMap[name] = &sync.Mutex{}
 
