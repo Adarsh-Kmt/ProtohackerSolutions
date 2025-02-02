@@ -156,7 +156,7 @@ func (chat *BudgetChat) handleUserExit(name string) error {
 	chat.clientsMutex.Unlock()
 
 	userExitMessage := "* " + name + " has left the chat."
-
+	slog.Info(userExitMessage)
 	if err := chat.broadcastData(name, []byte(userExitMessage)); err != nil {
 		return err
 	}
