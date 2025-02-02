@@ -48,6 +48,7 @@ func (chat *BudgetChat) setName(conn net.Conn) (name string, err error) {
 
 	reader := bufio.NewReader(conn)
 
+	slog.Info("waiting for user to choose name...")
 	name, err = reader.ReadString('\n')
 	if err != nil {
 		slog.Error(err.Error(), "msg", "error while reading client's name")
