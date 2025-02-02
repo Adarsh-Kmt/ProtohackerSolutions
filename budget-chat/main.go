@@ -52,6 +52,8 @@ func (chat *BudgetChat) setName(conn net.Conn) (name string, err error) {
 		slog.Error(err.Error(), "msg", "error while reading client's name")
 		return "", err
 	}
+	chat.clientsMutex.Lock()
+
 	if chat.clients[name] != nil {
 		slog.Error("user with name " + name + " already exists.")
 		return "", fmt.Errorf("user with name " + name + " already exists.")
@@ -60,8 +62,6 @@ func (chat *BudgetChat) setName(conn net.Conn) (name string, err error) {
 		slog.Error("user with name " + name + " is not a valid name.")
 		return "", fmt.Errorf("user with name " + name + " is not a valid name.")
 	}
-
-	chat.clientsMutex.Lock()
 
 	chat.clients[name] = conn
 	chat.connMutexMap[name] = &sync.Mutex{}
@@ -168,8 +168,10 @@ func (chat *BudgetChat) handleClient(conn net.Conn) {
 
 	_, err := conn.Write([]byte(welcomeMessageFormat))
 	if err != nil {
-		slog.Error(err.Error(), "msg", "error while writing welcome message to client")
+		slog.Error(err.Error(), "msg", "error while writing welcome message to client.")
 		return
+	} else {
+		slog.Info("sent welcome message.")
 	}
 
 	name, err := chat.setName(conn)
