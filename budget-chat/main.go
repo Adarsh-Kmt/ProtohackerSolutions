@@ -58,10 +58,12 @@ func (chat *BudgetChat) setName(conn net.Conn) (name string, err error) {
 	chat.clientsMutex.Lock()
 
 	if chat.clients[name] != nil {
+		chat.clientsMutex.Unlock()
 		slog.Error("user with name " + name + " already exists.")
 		return "", fmt.Errorf("user with name " + name + " already exists.")
 	}
 	if !validateName(name) {
+		chat.clientsMutex.Unlock()
 		slog.Error("user with name " + name + " is not a valid name.")
 		return "", fmt.Errorf("user with name " + name + " is not a valid name.")
 	}
