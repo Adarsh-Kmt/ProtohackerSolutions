@@ -10,7 +10,7 @@ import (
 
 const (
 	welcomeMessageFormat     = "Welcome to budget-chat! what do we call you?\n"
-	userMessageFormat        = "[%s] %s\n"
+	userMessageFormat        = "[%s] %s"
 	userJoinedMessageFormat  = "* %s has joined the chat.\n"
 	userExitedMessageFormat  = "* %s has exited the chat.\n"
 	onlineUsersMessageFormat = "* online users: "
@@ -107,7 +107,7 @@ func (chat *BudgetChat) broadcastPresenceNotification(name string) error {
 	usersOnlineNotification := onlineUsersMessageFormat
 
 	userJoinedMessage := fmt.Sprintf(userJoinedMessageFormat, name)
-	slog.Info("broadcasting message " + userJoinedMessage)
+	slog.Info("broadcasting message " + userJoinedMessage + " to all users")
 	chat.clientsMutex.RLock()
 
 	for username, _ := range chat.clients {
@@ -121,7 +121,7 @@ func (chat *BudgetChat) broadcastPresenceNotification(name string) error {
 	if err := chat.broadcastData(name, []byte(userJoinedMessage)); err != nil {
 		return err
 	}
-
+	slog.Info("sending message " + usersOnlineNotification + " to user " + name)
 	if err := chat.sendData(name, []byte(usersOnlineNotification)); err != nil {
 		return err
 	}
