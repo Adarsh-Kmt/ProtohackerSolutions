@@ -52,6 +52,7 @@ func (chat *BudgetChat) setName(conn net.Conn) (name string, err error) {
 		slog.Error(err.Error(), "msg", "error while reading client's name")
 		return "", err
 	}
+	name = name[:len(name)-1]
 	chat.clientsMutex.Lock()
 
 	if chat.clients[name] != nil {
