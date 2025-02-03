@@ -106,7 +106,7 @@ func (db *Database) HandleRequests() {
 		} else {
 			slog.Info(fmt.Sprintf("received query request => key =%q!", request))
 			value := db.handleRetrieveRequest(request)
-			response := request + "=" + value + "\n\r"
+			response := request + "=" + value
 			if value == "" {
 				slog.Info(fmt.Sprintf("didnt find value for key =%s!", request))
 			} else {
