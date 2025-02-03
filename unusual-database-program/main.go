@@ -9,12 +9,13 @@ import (
 )
 
 type Database struct {
+	version       string
 	conn          net.UDPConn
 	keyValueStore map[string]string
 	mutex         *sync.RWMutex
 }
 
-func NewDatabase(addr string) (*Database, error) {
+func NewDatabase(addr string, version string) (*Database, error) {
 
 	udpAddr, err := net.ResolveUDPAddr("udp", addr)
 	if err != nil {
@@ -26,6 +27,7 @@ func NewDatabase(addr string) (*Database, error) {
 		return nil, err
 	}
 	return &Database{
+		version:       version,
 		conn:          *conn,
 		keyValueStore: make(map[string]string),
 		mutex:         &sync.RWMutex{},
@@ -100,12 +102,24 @@ func (db *Database) HandleRequests() {
 		if equalToFound {
 
 			key, value := parseInsertRequest(request)
+
+			if key == db.version {
+				continue
+			}
 			slog.Info(fmt.Sprintf("received insert request => key = %q value = %q", key, value))
 			db.handleInsertRequest(key, value)
 
 		} else {
 			slog.Info(fmt.Sprintf("received query request => key =%q!", request))
-			value := db.handleRetrieveRequest(request)
+
+			var value string
+
+			if request == "version" {
+				value = db.version
+			} else {
+				value = db.handleRetrieveRequest(request)
+			}
+
 			response := request + "=" + value
 			if value == "" {
 				slog.Info(fmt.Sprintf("didnt find value for key =%s!", request))
@@ -122,7 +136,7 @@ func (db *Database) HandleRequests() {
 }
 func main() {
 
-	db, err := NewDatabase("0.0.0.0:8080")
+	db, err := NewDatabase("0.0.0.0:8080", "Adarsh's Key-Value Store 1.0")
 
 	if err != nil {
 		slog.Error(err.Error(), "msg", "error while assigning port 8080 to listen for UDP messages.")
