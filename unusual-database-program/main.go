@@ -88,7 +88,6 @@ func (db *Database) HandleRequests() {
 			slog.Error(err.Error(), "msg", "error while reading UDP packet.")
 		}
 		request := string(buf[:n])
-		request = request[:len(request)-2]
 
 		equalToFound := false
 		for _, ch := range request {
@@ -107,7 +106,7 @@ func (db *Database) HandleRequests() {
 		} else {
 			slog.Info(fmt.Sprintf("received query request => key =%q!", request))
 			value := db.handleRetrieveRequest(request)
-			response := request + "=" + value
+			response := request + "=" + value + "\n\r"
 			if value == "" {
 				slog.Info(fmt.Sprintf("didnt find value for key =%s!", request))
 			} else {
