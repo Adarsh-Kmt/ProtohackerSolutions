@@ -1,9 +1,6 @@
 package main
 
 import (
-	"fmt"
-	"log"
-	"log/slog"
 	"net"
 	"sync"
 )
@@ -38,7 +35,7 @@ func (db *Database) handleInsertRequest(key string, value string) {
 
 	db.mutex.Lock()
 	db.keyValueStore[key] = value
-	log.Println(db.keyValueStore)
+	//log.Println(db.keyValueStore)
 	db.mutex.Unlock()
 }
 
@@ -87,7 +84,7 @@ func (db *Database) HandleRequests() {
 		n, addr, err := db.conn.ReadFromUDP(buf)
 
 		if err != nil {
-			slog.Error(err.Error(), "msg", "error while reading UDP packet.")
+			//slog.Error(err.Error(), "msg", "error while reading UDP packet.")
 		}
 		request := string(buf[:n])
 
@@ -106,11 +103,11 @@ func (db *Database) HandleRequests() {
 			if key == db.version {
 				continue
 			}
-			slog.Info(fmt.Sprintf("received insert request => key = %q value = %q", key, value))
+			//slog.Info(fmt.Sprintf("received insert request => key = %q value = %q", key, value))
 			db.handleInsertRequest(key, value)
 
 		} else {
-			slog.Info(fmt.Sprintf("received query request => key =%q!", request))
+			//slog.Info(fmt.Sprintf("received query request => key =%q!", request))
 
 			var value string
 
@@ -121,13 +118,13 @@ func (db *Database) HandleRequests() {
 			}
 
 			response := request + "=" + value
-			if value == "" {
-				slog.Info(fmt.Sprintf("didnt find value for key =%s!", request))
-			} else {
-				slog.Info(fmt.Sprintf("received value = %s for key =%s!", value, request))
-			}
+			//if value == "" {
+			//	slog.Info(fmt.Sprintf("didnt find value for key =%s!", request))
+			//} else {
+			//	slog.Info(fmt.Sprintf("received value = %s for key =%s!", value, request))
+			//}
 			if _, err := db.conn.WriteToUDP([]byte(response), addr); err != nil {
-				slog.Error("error while writing value back to client.")
+				//slog.Error("error while writing value back to client.")
 				return
 			}
 		}
@@ -139,7 +136,7 @@ func main() {
 	db, err := NewDatabase("0.0.0.0:8080", "Adarsh's Key-Value Store 1.0")
 
 	if err != nil {
-		slog.Error(err.Error(), "msg", "error while assigning port 8080 to listen for UDP messages.")
+		//slog.Error(err.Error(), "msg", "error while assigning port 8080 to listen for UDP messages.")
 		return
 	}
 
