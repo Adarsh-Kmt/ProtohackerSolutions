@@ -5,6 +5,7 @@ import (
 	"log/slog"
 	"net"
 	"strings"
+	"sync"
 )
 
 const (
@@ -74,8 +75,9 @@ func searchAndReplaceBGAddress(message string) (newMessage string) {
 
 }
 
-func listenToClientWriteToUpstream(clientConn net.Conn, upstreamConn net.Conn) {
+func listenToClientWriteToUpstream(clientConn net.Conn, upstreamConn net.Conn, wg *sync.WaitGroup) {
 
+	defer wg.Done()
 	clientConnReader := bufio.NewReader(clientConn)
 
 	for {
@@ -96,7 +98,9 @@ func listenToClientWriteToUpstream(clientConn net.Conn, upstreamConn net.Conn) {
 	}
 }
 
-func listenToUpstreamWriteToClient(clientConn net.Conn, upstreamConn net.Conn) {
+func listenToUpstreamWriteToClient(clientConn net.Conn, upstreamConn net.Conn, wg *sync.WaitGroup) {
+
+	defer wg.Done()
 
 	upstreamConnReader := bufio.NewReader(upstreamConn)
 
@@ -140,8 +144,12 @@ func handleClient(clientConn net.Conn) {
 		return
 	}
 
-	go listenToClientWriteToUpstream(clientConn, upstreamConn)
-	go listenToUpstreamWriteToClient(clientConn, upstreamConn)
+	wg := &sync.WaitGroup{}
+	wg.Add(1)
+	wg.Add(1)
+	go listenToClientWriteToUpstream(clientConn, upstreamConn, wg)
+	go listenToUpstreamWriteToClient(clientConn, upstreamConn, wg)
+	wg.Wait()
 }
 func main() {
 
