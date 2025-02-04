@@ -105,15 +105,16 @@ func handleClient(clientConn net.Conn) {
 			return
 		}
 
+		slog.Info("received message " + clientMessage + " from client.")
 		upstreamMessage := searchAndReplaceBGAddress(clientMessage[:len(clientMessage)-1])
 
+		slog.Info("sending message " + upstreamMessage + " to upstream server.")
 		if _, err := upstreamConn.Write([]byte(upstreamMessage)); err != nil {
 			slog.Error(err.Error(), "msg", "error while sending message to upstream server.")
 			return
 		}
-
 		response, err := upstreamConnReader.ReadString('\n')
-
+		slog.Info("received message " + response + " from upstream server.")
 		if err != nil {
 			slog.Error(err.Error(), "msg", "error while reading response from upstream server.")
 			return
