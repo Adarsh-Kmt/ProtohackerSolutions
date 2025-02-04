@@ -134,6 +134,7 @@ func handleClient(clientConn net.Conn) {
 		slog.Error(err.Error(), "msg", "error while reading welcome message from upstream server.")
 		return
 	}
+	slog.Info("received welcome message " + welcomeMessage + " from upstream server.")
 	if _, err := clientConn.Write([]byte(welcomeMessage)); err != nil {
 		slog.Error(err.Error(), "msg", "error while sending welcome message to client.")
 		return
