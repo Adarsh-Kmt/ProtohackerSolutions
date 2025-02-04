@@ -144,9 +144,7 @@ func handleClient(clientConn net.Conn) {
 }
 func main() {
 
-	listener, err := net.Listen("tcp", ":8080")
-
-	defer listener.Close()
+	listener, err := net.Listen("tcp", "0.0.0.0:8080")
 
 	if err != nil {
 		slog.Error(err.Error(), "msg", "error while listening on port 8080")
