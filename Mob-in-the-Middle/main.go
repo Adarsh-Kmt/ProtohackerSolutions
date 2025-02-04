@@ -35,24 +35,24 @@ func isBGAddress(word string) bool {
 }
 func searchAndReplaceBGAddress(message string) (newMessage string) {
 
-	numLeadingWhitespaces := 0
-	numTrailingWhitespaces := 0
-
-	for _, char := range message {
-		if char == ' ' {
-			numLeadingWhitespaces++
-		} else {
-			break
-		}
-	}
-
-	for ind := range len(message) {
-		if message[len(message)-ind-1] == ' ' {
-			numTrailingWhitespaces++
-		} else {
-			break
-		}
-	}
+	//numLeadingWhitespaces := 0
+	//numTrailingWhitespaces := 0
+	//
+	//for _, char := range message {
+	//	if char == ' ' {
+	//		numLeadingWhitespaces++
+	//	} else {
+	//		break
+	//	}
+	//}
+	//
+	//for ind := range len(message) {
+	//	if message[len(message)-ind-1] == ' ' {
+	//		numTrailingWhitespaces++
+	//	} else {
+	//		break
+	//	}
+	//}
 	words := strings.Split(message, " ")
 
 	if strings.Contains(message, "omniscient") {
@@ -74,7 +74,7 @@ func searchAndReplaceBGAddress(message string) (newMessage string) {
 	//}
 
 	newMessage = strings.Join(words, " ")
-	newMessage = strings.Repeat(" ", numLeadingWhitespaces) + newMessage + strings.Repeat(" ", numTrailingWhitespaces) + "\n"
+	newMessage = newMessage + "\n"
 
 	return newMessage
 
