@@ -15,19 +15,19 @@ const (
 func isBGAddress(word string) bool {
 
 	if len(word) < 26 || len(word) > 35 {
-		slog.Info("BG address " + word + " was too short/long")
+		//slog.Info("BG address " + word + " was too short/long")
 		return false
 	}
 
 	if word[0] != '7' {
-		slog.Info("BG address " + word + " didnt start with 7")
+		//slog.Info("BG address " + word + " didnt start with 7")
 		return false
 	}
 
 	for _, char := range word {
 
 		if !((char >= 'a' && char <= 'z') || (char >= 'A' && char <= 'Z') || (char >= '0' && char <= '9')) {
-			slog.Info("BG address " + word + " contains " + string(char) + " which is not alphanumeric")
+			//slog.Info("BG address " + word + " contains " + string(char) + " which is not alphanumeric")
 			return false
 		}
 	}
