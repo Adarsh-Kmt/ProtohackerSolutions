@@ -73,30 +73,10 @@ func searchAndReplaceBGAddress(message string) (newMessage string) {
 	return newMessage
 
 }
-func handleClient(clientConn net.Conn) {
-	defer clientConn.Close()
 
-	upstreamConn, err := net.Dial("tcp", "chat.protohackers.com:16963")
-
-	if err != nil {
-		slog.Error(err.Error(), "msg", "error while establishing upstream connection with budget-chat server.")
-		return
-	}
-
-	defer upstreamConn.Close()
+func listenToClientWriteToUpstream(clientConn net.Conn, upstreamConn net.Conn) {
 
 	clientConnReader := bufio.NewReader(clientConn)
-	upstreamConnReader := bufio.NewReader(upstreamConn)
-
-	welcomeMessage, err := upstreamConnReader.ReadString('\n')
-	if err != nil {
-		slog.Error(err.Error(), "msg", "error while reading welcome message from upstream server.")
-		return
-	}
-	if _, err := clientConn.Write([]byte(welcomeMessage)); err != nil {
-		slog.Error(err.Error(), "msg", "error while sending welcome message to client.")
-		return
-	}
 
 	for {
 		clientMessage, err := clientConnReader.ReadString('\n')
@@ -113,6 +93,14 @@ func handleClient(clientConn net.Conn) {
 			slog.Error(err.Error(), "msg", "error while sending message to upstream server.")
 			return
 		}
+	}
+}
+
+func listenToUpstreamWriteToClient(clientConn net.Conn, upstreamConn net.Conn) {
+
+	upstreamConnReader := bufio.NewReader(clientConn)
+
+	for {
 		response, err := upstreamConnReader.ReadString('\n')
 		slog.Info("received message " + response + " from upstream server.")
 		if err != nil {
@@ -125,8 +113,34 @@ func handleClient(clientConn net.Conn) {
 			return
 
 		}
-
 	}
+}
+func handleClient(clientConn net.Conn) {
+
+	defer clientConn.Close()
+
+	upstreamConn, err := net.Dial("tcp", "chat.protohackers.com:16963")
+
+	if err != nil {
+		slog.Error(err.Error(), "msg", "error while establishing upstream connection with budget-chat server.")
+		return
+	}
+	defer upstreamConn.Close()
+
+	upstreamConnReader := bufio.NewReader(upstreamConn)
+
+	welcomeMessage, err := upstreamConnReader.ReadString('\n')
+	if err != nil {
+		slog.Error(err.Error(), "msg", "error while reading welcome message from upstream server.")
+		return
+	}
+	if _, err := clientConn.Write([]byte(welcomeMessage)); err != nil {
+		slog.Error(err.Error(), "msg", "error while sending welcome message to client.")
+		return
+	}
+
+	go listenToClientWriteToUpstream(clientConn, upstreamConn)
+	go listenToUpstreamWriteToClient(clientConn, upstreamConn)
 }
 func main() {
 
