@@ -55,11 +55,9 @@ func searchAndReplaceBGAddress(message string) (newMessage string) {
 	}
 	words := strings.Split(message, " ")
 
-	bogusCoinAddressDetected := false
 	for i, word := range words {
 
 		if isBGAddress(word) {
-			bogusCoinAddressDetected = true
 			words[i] = tonyAddress
 		}
 	}
@@ -71,10 +69,6 @@ func searchAndReplaceBGAddress(message string) (newMessage string) {
 	//		words[len(words) - i - 1] = tonyAddress
 	//	}
 	//}
-
-	if !bogusCoinAddressDetected {
-		return message + "\n"
-	}
 
 	newMessage = strings.Join(words, " ")
 	newMessage = strings.Repeat(" ", numLeadingWhitespaces) + newMessage + strings.Repeat(" ", numTrailingWhitespaces) + "\n"
@@ -161,21 +155,24 @@ func handleClient(clientConn net.Conn) {
 }
 func main() {
 
-	listener, err := net.Listen("tcp", "0.0.0.0:8080")
+	//listener, err := net.Listen("tcp", "0.0.0.0:8080")
+	//
+	//if err != nil {
+	//	slog.Error(err.Error(), "msg", "error while listening on port 8080")
+	//	return
+	//}
+	//
+	//for {
+	//
+	//	conn, err := listener.Accept()
+	//	if err != nil {
+	//		slog.Error(err.Error(), "msg", "error while accepting connection")
+	//		return
+	//	}
+	//
+	//	go handleClient(conn)
+	//}
 
-	if err != nil {
-		slog.Error(err.Error(), "msg", "error while listening on port 8080")
-		return
-	}
+	slog.Info(searchAndReplaceBGAddress("[SmallHunter254] Send refunds please."))
 
-	for {
-
-		conn, err := listener.Accept()
-		if err != nil {
-			slog.Error(err.Error(), "msg", "error while accepting connection")
-			return
-		}
-
-		go handleClient(conn)
-	}
 }
