@@ -55,6 +55,9 @@ func searchAndReplaceBGAddress(message string) (newMessage string) {
 	}
 	words := strings.Split(message, " ")
 
+	if strings.Contains(message, "omniscient") {
+		slog.Info("detected the mystery watchman, message => " + message)
+	}
 	for i, word := range words {
 
 		if isBGAddress(word) {
