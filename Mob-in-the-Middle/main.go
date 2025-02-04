@@ -98,7 +98,7 @@ func listenToClientWriteToUpstream(clientConn net.Conn, upstreamConn net.Conn) {
 
 func listenToUpstreamWriteToClient(clientConn net.Conn, upstreamConn net.Conn) {
 
-	upstreamConnReader := bufio.NewReader(clientConn)
+	upstreamConnReader := bufio.NewReader(upstreamConn)
 
 	for {
 		response, err := upstreamConnReader.ReadString('\n')
