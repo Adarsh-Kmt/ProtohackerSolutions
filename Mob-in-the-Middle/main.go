@@ -51,18 +51,22 @@ func searchAndReplaceBGAddress(message string) (newMessage string) {
 	}
 	words := strings.Split(message, " ")
 
-	firstWord := words[0]
-	lastWord := words[len(words)-1]
-
 	bogusCoinAddressDetected := false
-	if isBGAddress(firstWord) {
-		words[0] = tonyAddress
-		bogusCoinAddressDetected = true
+	for i, word := range words {
+
+		if isBGAddress(word) {
+			bogusCoinAddressDetected = true
+			words[i] = tonyAddress
+		}
 	}
-	if isBGAddress(lastWord) {
-		words[len(words)-1] = tonyAddress
-		bogusCoinAddressDetected = true
-	}
+
+	//for i := range len(words) {
+	//
+	//	if isBGAddress(words[len(words) - i - 1]) {
+	//		bogusCoinAddressDetected = true
+	//		words[len(words) - i - 1] = tonyAddress
+	//	}
+	//}
 
 	if !bogusCoinAddressDetected {
 		return message + "\n"
