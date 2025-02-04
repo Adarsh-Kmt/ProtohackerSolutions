@@ -90,6 +90,7 @@ func listenToClientWriteToUpstream(clientConn net.Conn, upstreamConn net.Conn, w
 		}
 
 		slog.Info("received message " + clientMessage + " from client.")
+
 		upstreamMessage := searchAndReplaceBGAddress(clientMessage[:len(clientMessage)-1])
 
 		slog.Info("sending message " + upstreamMessage + " to upstream server.")
@@ -114,7 +115,8 @@ func listenToUpstreamWriteToClient(clientConn net.Conn, upstreamConn net.Conn, w
 			return
 		}
 
-		if _, err := clientConn.Write([]byte(response)); err != nil {
+		clientMessage := searchAndReplaceBGAddress(response[:len(response)-1])
+		if _, err := clientConn.Write([]byte(clientMessage)); err != nil {
 			slog.Error(err.Error(), "msg", "error while sending response back to client.")
 			return
 
@@ -157,6 +159,7 @@ func main() {
 
 	listener, err := net.Listen("tcp", "0.0.0.0:8080")
 
+	slog.Info(searchAndReplaceBGAddress("[RedBob926] Send refunds to 7YWHMfk9JZe0LM0g1ZauHuiSxhI please."))
 	if err != nil {
 		slog.Error(err.Error(), "msg", "error while listening on port 8080")
 		return
