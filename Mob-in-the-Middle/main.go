@@ -155,24 +155,22 @@ func handleClient(clientConn net.Conn) {
 }
 func main() {
 
-	//listener, err := net.Listen("tcp", "0.0.0.0:8080")
-	//
-	//if err != nil {
-	//	slog.Error(err.Error(), "msg", "error while listening on port 8080")
-	//	return
-	//}
-	//
-	//for {
-	//
-	//	conn, err := listener.Accept()
-	//	if err != nil {
-	//		slog.Error(err.Error(), "msg", "error while accepting connection")
-	//		return
-	//	}
-	//
-	//	go handleClient(conn)
-	//}
+	listener, err := net.Listen("tcp", "0.0.0.0:8080")
 
-	slog.Info(searchAndReplaceBGAddress("[SmallHunter254] Send refunds please."))
+	if err != nil {
+		slog.Error(err.Error(), "msg", "error while listening on port 8080")
+		return
+	}
+
+	for {
+
+		conn, err := listener.Accept()
+		if err != nil {
+			slog.Error(err.Error(), "msg", "error while accepting connection")
+			return
+		}
+
+		go handleClient(conn)
+	}
 
 }
