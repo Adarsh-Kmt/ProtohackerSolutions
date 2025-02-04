@@ -14,7 +14,7 @@ const (
 
 func isBGAddress(word string) bool {
 
-	if len(word) < 26 || len(word) > 35 {
+	if len(word) <= 26 || len(word) >= 35 {
 		return false
 	}
 	if word[0] != '7' {
