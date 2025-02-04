@@ -85,15 +85,15 @@ func listenToClientWriteToUpstream(clientConn net.Conn, upstreamConn net.Conn, w
 	for {
 		clientMessage, err := clientConnReader.ReadString('\n')
 		if err != nil {
-			slog.Error(err.Error(), "msg", "error while reading message from client.")
+			//slog.Error(err.Error(), "msg", "error while reading message from client.")
 			return
 		}
 
-		slog.Info("received message " + clientMessage + " from client.")
+		//slog.Info("received message " + clientMessage + " from client.")
 
 		upstreamMessage := searchAndReplaceBGAddress(clientMessage[:len(clientMessage)-1])
 
-		slog.Info("sending message " + upstreamMessage + " to upstream server.")
+		//slog.Info("sending message " + upstreamMessage + " to upstream server.")
 		if _, err := upstreamConn.Write([]byte(upstreamMessage)); err != nil {
 			slog.Error(err.Error(), "msg", "error while sending message to upstream server.")
 			return
@@ -109,15 +109,15 @@ func listenToUpstreamWriteToClient(clientConn net.Conn, upstreamConn net.Conn, w
 
 	for {
 		response, err := upstreamConnReader.ReadString('\n')
-		slog.Info("received message " + response + " from upstream server.")
+		//slog.Info("received message " + response + " from upstream server.")
 		if err != nil {
-			slog.Error(err.Error(), "msg", "error while reading response from upstream server.")
+			//slog.Error(err.Error(), "msg", "error while reading response from upstream server.")
 			return
 		}
 
 		clientMessage := searchAndReplaceBGAddress(response[:len(response)-1])
 		if _, err := clientConn.Write([]byte(clientMessage)); err != nil {
-			slog.Error(err.Error(), "msg", "error while sending response back to client.")
+			//slog.Error(err.Error(), "msg", "error while sending response back to client.")
 			return
 
 		}
@@ -142,7 +142,7 @@ func handleClient(clientConn net.Conn) {
 		slog.Error(err.Error(), "msg", "error while reading welcome message from upstream server.")
 		return
 	}
-	slog.Info("received welcome message " + welcomeMessage + " from upstream server.")
+	//slog.Info("received welcome message " + welcomeMessage + " from upstream server.")
 	if _, err := clientConn.Write([]byte(welcomeMessage)); err != nil {
 		slog.Error(err.Error(), "msg", "error while sending welcome message to client.")
 		return
@@ -159,7 +159,7 @@ func main() {
 
 	listener, err := net.Listen("tcp", "0.0.0.0:8080")
 
-	slog.Info(searchAndReplaceBGAddress("[RedBob926] Send refunds to 7YWHMfk9JZe0LM0g1ZauHuiSxhI please."))
+	//slog.Info(searchAndReplaceBGAddress("[RedBob926] Send refunds to 7YWHMfk9JZe0LM0g1ZauHuiSxhI please."))
 	if err != nil {
 		slog.Error(err.Error(), "msg", "error while listening on port 8080")
 		return
