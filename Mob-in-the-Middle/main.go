@@ -55,9 +55,9 @@ func searchAndReplaceBGAddress(message string) (newMessage string) {
 	message = message[:len(message)-1]
 	words := strings.Split(message, " ")
 
-	if strings.Contains(message, "*") {
-		slog.Info("user is joining or leaving, message => " + message)
-	}
+	//if strings.Contains(message, "*") {
+	//	slog.Info("user is joining or leaving, message => " + message)
+	//}
 	for i, word := range words {
 
 		if isBGAddress(word) {
