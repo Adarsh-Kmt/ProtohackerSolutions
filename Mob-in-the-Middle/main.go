@@ -5,12 +5,15 @@ import (
 	"fmt"
 	"log/slog"
 	"net"
+	"regexp"
 	"strings"
 )
 
 const (
 	tonyAddress = "7YWHMfk9JZe0LM0g1ZauHuiSxhI"
 )
+
+var bogusCoin = regexp.MustCompile(`^7[a-zA-Z0-9]{25,34}$`)
 
 func isBGAddress(word string) bool {
 
@@ -33,25 +36,23 @@ func isBGAddress(word string) bool {
 	}
 	return true
 }
-func searchAndReplaceBGAddress(message string) (newMessage string) {
+func searchAndReplaceBGAddress(msg string) (newMessage string) {
 
-	message = message[:len(message)-1]
-	words := strings.Split(message, " ")
-
-	for i, word := range words {
-
-		if isBGAddress(word) {
-			words[i] = tonyAddress
-		}
+	tokens := make([]string, 0, 8)
+	for _, raw := range strings.Split(msg[:len(msg)-1], " ") {
+		t := bogusCoin.ReplaceAllString(raw, "7YWHMfk9JZe0LM0g1ZauHuiSxhI")
+		tokens = append(tokens, t)
 	}
 
-	newMessage = strings.Join(words, " ")
-	newMessage = newMessage + "\n"
-	return newMessage
+	out := strings.Join(tokens, " ") + "\n"
+	return out
 
 }
 
 func forward(source net.Conn, destination net.Conn) {
+
+	defer source.Close()
+	defer destination.Close()
 
 	sourceReader := bufio.NewReader(source)
 
@@ -75,15 +76,12 @@ func forward(source net.Conn, destination net.Conn) {
 }
 func handleClient(clientConn net.Conn) {
 
-	defer clientConn.Close()
-
 	upstreamConn, err := net.Dial("tcp", "chat.protohackers.com:16963")
 
 	if err != nil {
 		slog.Error(err.Error(), "msg", "error while establishing upstream connection with budget-chat server.")
 		return
 	}
-	defer upstreamConn.Close()
 
 	upstreamConnReader := bufio.NewReader(upstreamConn)
 
