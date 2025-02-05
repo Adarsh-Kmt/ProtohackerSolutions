@@ -5,7 +5,6 @@ import (
 	"log/slog"
 	"net"
 	"strings"
-	"sync"
 )
 
 const (
@@ -79,23 +78,22 @@ func searchAndReplaceBGAddress(message string) (newMessage string) {
 
 }
 
-func listenToClientWriteToUpstream(clientConn net.Conn, upstreamConn net.Conn, wg *sync.WaitGroup) {
+func listenToClientWriteToUpstream(clientConn net.Conn, upstreamConn net.Conn) {
 
-	defer wg.Done()
 	clientConnReader := bufio.NewReader(clientConn)
 
 	for {
 		clientMessage, err := clientConnReader.ReadString('\n')
 		if err != nil {
-			//slog.Error(err.Error(), "msg", "error while reading message from client.")
+			slog.Error(err.Error(), "msg", "error while reading message from client.")
 			return
 		}
 
-		//slog.Info("received message " + clientMessage + " from client.")
+		slog.Info("received message " + clientMessage + " from client.")
 
 		upstreamMessage := searchAndReplaceBGAddress(clientMessage)
 
-		//slog.Info("sending message " + upstreamMessage + " to upstream server.")
+		slog.Info("sending message " + upstreamMessage + " to upstream server.")
 		if _, err := upstreamConn.Write([]byte(upstreamMessage)); err != nil {
 			slog.Error(err.Error(), "msg", "error while sending message to upstream server.")
 			return
@@ -103,23 +101,21 @@ func listenToClientWriteToUpstream(clientConn net.Conn, upstreamConn net.Conn, w
 	}
 }
 
-func listenToUpstreamWriteToClient(clientConn net.Conn, upstreamConn net.Conn, wg *sync.WaitGroup) {
-
-	defer wg.Done()
+func listenToUpstreamWriteToClient(clientConn net.Conn, upstreamConn net.Conn) {
 
 	upstreamConnReader := bufio.NewReader(upstreamConn)
 
 	for {
 		response, err := upstreamConnReader.ReadString('\n')
-		//slog.Info("received message " + response + " from upstream server.")
+		slog.Info("received message " + response + " from upstream server.")
 		if err != nil {
-			//slog.Error(err.Error(), "msg", "error while reading response from upstream server.")
+			slog.Error(err.Error(), "msg", "error while reading response from upstream server.")
 			return
 		}
 
 		clientMessage := searchAndReplaceBGAddress(response)
 		if _, err := clientConn.Write([]byte(clientMessage)); err != nil {
-			//slog.Error(err.Error(), "msg", "error while sending response back to client.")
+			slog.Error(err.Error(), "msg", "error while sending response back to client.")
 			return
 
 		}
@@ -150,12 +146,9 @@ func handleClient(clientConn net.Conn) {
 		return
 	}
 
-	wg := &sync.WaitGroup{}
-	wg.Add(1)
-	wg.Add(1)
-	go listenToClientWriteToUpstream(clientConn, upstreamConn, wg)
-	go listenToUpstreamWriteToClient(clientConn, upstreamConn, wg)
-	wg.Wait()
+	go listenToClientWriteToUpstream(clientConn, upstreamConn)
+	listenToUpstreamWriteToClient(clientConn, upstreamConn)
+
 }
 func main() {
 
