@@ -79,46 +79,22 @@ func searchAndReplaceBGAddress(message string) (newMessage string) {
 
 }
 
-func listenToClientWriteToUpstream(clientConn net.Conn, upstreamConn net.Conn) {
+func forward(source net.Conn, destination net.Conn) {
 
-	clientConnReader := bufio.NewReader(clientConn)
-
-	for {
-		clientMessage, err := clientConnReader.ReadString('\n')
-		if err != nil {
-			slog.Error(err.Error(), "msg", "error while reading message from client.")
-			return
-		}
-
-		slog.Info(fmt.Sprintf("received message %q from client.", clientMessage))
-
-		upstreamMessage := searchAndReplaceBGAddress(clientMessage)
-
-		slog.Info(fmt.Sprintf("sending message %q to upstream server.", upstreamMessage))
-
-		if _, err := upstreamConn.Write([]byte(upstreamMessage)); err != nil {
-			slog.Error(err.Error(), "msg", "error while sending message to upstream server.")
-			return
-		}
-	}
-}
-
-func listenToUpstreamWriteToClient(clientConn net.Conn, upstreamConn net.Conn) {
-
-	upstreamConnReader := bufio.NewReader(upstreamConn)
+	sourceReader := bufio.NewReader(source)
 
 	for {
-		response, err := upstreamConnReader.ReadString('\n')
-		slog.Info(fmt.Sprintf("received message %q from upstream server.", response))
+		message, err := sourceReader.ReadString('\n')
+		slog.Info(fmt.Sprintf("received message %q source", message))
 		//slog.Info("received message " + response + " from upstream server.")
 		if err != nil {
 			slog.Error(err.Error(), "msg", "error while reading response from upstream server.")
 			return
 		}
 
-		clientMessage := searchAndReplaceBGAddress(response)
-		slog.Info(fmt.Sprintf("sending message %q to client.", clientMessage))
-		if _, err := clientConn.Write([]byte(clientMessage)); err != nil {
+		message = searchAndReplaceBGAddress(message)
+		slog.Info(fmt.Sprintf("sending message %q to client.", message))
+		if _, err := destination.Write([]byte(message)); err != nil {
 			slog.Error(err.Error(), "msg", "error while sending response back to client.")
 			return
 
@@ -150,8 +126,8 @@ func handleClient(clientConn net.Conn) {
 		return
 	}
 
-	go listenToClientWriteToUpstream(clientConn, upstreamConn)
-	listenToUpstreamWriteToClient(clientConn, upstreamConn)
+	go forward(clientConn, upstreamConn)
+	go forward(upstreamConn, clientConn)
 
 }
 func main() {
