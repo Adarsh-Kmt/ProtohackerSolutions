@@ -56,7 +56,7 @@ func searchAndReplaceBGAddress(message string) (newMessage string) {
 	words := strings.Split(message, " ")
 
 	if strings.Contains(message, "*") {
-		slog.Info("user is joining or leaveing, message => " + message)
+		slog.Info("user is joining or leaving, message => " + message)
 	}
 	for i, word := range words {
 
@@ -94,7 +94,7 @@ func listenToClientWriteToUpstream(clientConn net.Conn, upstreamConn net.Conn, w
 
 		//slog.Info("received message " + clientMessage + " from client.")
 
-		upstreamMessage := searchAndReplaceBGAddress(clientMessage[:len(clientMessage)-1])
+		upstreamMessage := searchAndReplaceBGAddress(clientMessage)
 
 		//slog.Info("sending message " + upstreamMessage + " to upstream server.")
 		if _, err := upstreamConn.Write([]byte(upstreamMessage)); err != nil {
@@ -118,7 +118,7 @@ func listenToUpstreamWriteToClient(clientConn net.Conn, upstreamConn net.Conn, w
 			return
 		}
 
-		clientMessage := searchAndReplaceBGAddress(response[:len(response)-1])
+		clientMessage := searchAndReplaceBGAddress(response)
 		if _, err := clientConn.Write([]byte(clientMessage)); err != nil {
 			//slog.Error(err.Error(), "msg", "error while sending response back to client.")
 			return
