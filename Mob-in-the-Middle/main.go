@@ -53,6 +53,7 @@ func searchAndReplaceBGAddress(message string) (newMessage string) {
 	//		break
 	//	}
 	//}
+	message = message[:len(message)-1]
 	words := strings.Split(message, " ")
 
 	if strings.Contains(message, "*") {
@@ -72,9 +73,8 @@ func searchAndReplaceBGAddress(message string) (newMessage string) {
 	//		words[len(words) - i - 1] = tonyAddress
 	//	}
 	//}
-
 	newMessage = strings.Join(words, " ")
-
+	newMessage = newMessage + "\n"
 	return newMessage
 
 }
