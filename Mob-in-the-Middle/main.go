@@ -7,6 +7,7 @@ import (
 	"net"
 	"regexp"
 	"strings"
+	"sync"
 )
 
 const (
@@ -15,32 +16,12 @@ const (
 
 var bogusCoin = regexp.MustCompile(`^7[a-zA-Z0-9]{25,34}$`)
 
-func isBGAddress(word string) bool {
-
-	if len(word) < 26 || len(word) > 35 {
-		//slog.Info("BG address " + word + " was too short/long")
-		return false
-	}
-
-	if word[0] != '7' {
-		//slog.Info("BG address " + word + " didnt start with 7")
-		return false
-	}
-
-	for _, char := range word {
-
-		if !((char >= 'a' && char <= 'z') || (char >= 'A' && char <= 'Z') || (char >= '0' && char <= '9')) {
-			//slog.Info("BG address " + word + " contains " + string(char) + " which is not alphanumeric")
-			return false
-		}
-	}
-	return true
-}
 func searchAndReplaceBGAddress(msg string) (newMessage string) {
 
 	tokens := make([]string, 0, 8)
+
 	for _, raw := range strings.Split(msg[:len(msg)-1], " ") {
-		t := bogusCoin.ReplaceAllString(raw, "7YWHMfk9JZe0LM0g1ZauHuiSxhI")
+		t := bogusCoin.ReplaceAllString(raw, tonyAddress)
 		tokens = append(tokens, t)
 	}
 
@@ -49,10 +30,12 @@ func searchAndReplaceBGAddress(msg string) (newMessage string) {
 
 }
 
-func forward(source net.Conn, destination net.Conn) {
+func forward(source net.Conn, destination net.Conn, once *sync.Once) {
 
-	defer source.Close()
-	defer destination.Close()
+	defer once.Do(func() {
+		source.Close()
+		destination.Close()
+	})
 
 	sourceReader := bufio.NewReader(source)
 
@@ -83,28 +66,28 @@ func handleClient(clientConn net.Conn) {
 		return
 	}
 
-	upstreamConnReader := bufio.NewReader(upstreamConn)
+	//upstreamConnReader := bufio.NewReader(upstreamConn)
+	//
+	//welcomeMessage, err := upstreamConnReader.ReadString('\n')
+	//if err != nil {
+	//	slog.Error(err.Error(), "msg", "error while reading welcome message from upstream server.")
+	//	return
+	//}
+	//slog.Info("received welcome message " + welcomeMessage + " from upstream server.")
+	//if _, err := clientConn.Write([]byte(welcomeMessage)); err != nil {
+	//	slog.Error(err.Error(), "msg", "error while sending welcome message to client.")
+	//	return
+	//}
 
-	welcomeMessage, err := upstreamConnReader.ReadString('\n')
-	if err != nil {
-		slog.Error(err.Error(), "msg", "error while reading welcome message from upstream server.")
-		return
-	}
-	slog.Info("received welcome message " + welcomeMessage + " from upstream server.")
-	if _, err := clientConn.Write([]byte(welcomeMessage)); err != nil {
-		slog.Error(err.Error(), "msg", "error while sending welcome message to client.")
-		return
-	}
-
-	go forward(clientConn, upstreamConn)
-	forward(upstreamConn, clientConn)
+	once := sync.Once{}
+	go forward(clientConn, upstreamConn, &once)
+	forward(upstreamConn, clientConn, &once)
 
 }
 func main() {
 
 	listener, err := net.Listen("tcp", "0.0.0.0:8080")
 
-	//slog.Info(searchAndReplaceBGAddress("[RedBob926] Send refunds to 7YWHMfk9JZe0LM0g1ZauHuiSxhI please."))
 	if err != nil {
 		slog.Error(err.Error(), "msg", "error while listening on port 8080")
 		return
