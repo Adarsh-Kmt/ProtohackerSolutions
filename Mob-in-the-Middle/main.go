@@ -35,30 +35,9 @@ func isBGAddress(word string) bool {
 }
 func searchAndReplaceBGAddress(message string) (newMessage string) {
 
-	//numLeadingWhitespaces := 0
-	//numTrailingWhitespaces := 0
-	//
-	//for _, char := range message {
-	//	if char == ' ' {
-	//		numLeadingWhitespaces++
-	//	} else {
-	//		break
-	//	}
-	//}
-	//
-	//for ind := range len(message) {
-	//	if message[len(message)-ind-1] == ' ' {
-	//		numTrailingWhitespaces++
-	//	} else {
-	//		break
-	//	}
-	//}
 	message = message[:len(message)-1]
 	words := strings.Split(message, " ")
 
-	//if strings.Contains(message, "*") {
-	//	slog.Info("user is joining or leaving, message => " + message)
-	//}
 	for i, word := range words {
 
 		if isBGAddress(word) {
@@ -66,13 +45,6 @@ func searchAndReplaceBGAddress(message string) (newMessage string) {
 		}
 	}
 
-	//for i := range len(words) {
-	//
-	//	if isBGAddress(words[len(words) - i - 1]) {
-	//		bogusCoinAddressDetected = true
-	//		words[len(words) - i - 1] = tonyAddress
-	//	}
-	//}
 	newMessage = strings.Join(words, " ")
 	newMessage = newMessage + "\n"
 	return newMessage
@@ -120,14 +92,14 @@ func handleClient(clientConn net.Conn) {
 		slog.Error(err.Error(), "msg", "error while reading welcome message from upstream server.")
 		return
 	}
-	//slog.Info("received welcome message " + welcomeMessage + " from upstream server.")
+	slog.Info("received welcome message " + welcomeMessage + " from upstream server.")
 	if _, err := clientConn.Write([]byte(welcomeMessage)); err != nil {
 		slog.Error(err.Error(), "msg", "error while sending welcome message to client.")
 		return
 	}
 
 	go forward(clientConn, upstreamConn)
-	go forward(upstreamConn, clientConn)
+	forward(upstreamConn, clientConn)
 
 }
 func main() {
