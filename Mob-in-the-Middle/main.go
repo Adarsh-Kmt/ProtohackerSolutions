@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"fmt"
 	"log/slog"
 	"net"
 	"strings"
@@ -89,11 +90,12 @@ func listenToClientWriteToUpstream(clientConn net.Conn, upstreamConn net.Conn) {
 			return
 		}
 
-		slog.Info("received message " + clientMessage + " from client.")
+		slog.Info(fmt.Sprintf("received message %q from client.", clientMessage))
 
 		upstreamMessage := searchAndReplaceBGAddress(clientMessage)
 
-		slog.Info("sending message " + upstreamMessage + " to upstream server.")
+		slog.Info(fmt.Sprintf("sending message %q to upstream server.", upstreamMessage))
+
 		if _, err := upstreamConn.Write([]byte(upstreamMessage)); err != nil {
 			slog.Error(err.Error(), "msg", "error while sending message to upstream server.")
 			return
@@ -107,13 +109,15 @@ func listenToUpstreamWriteToClient(clientConn net.Conn, upstreamConn net.Conn) {
 
 	for {
 		response, err := upstreamConnReader.ReadString('\n')
-		slog.Info("received message " + response + " from upstream server.")
+		slog.Info(fmt.Sprintf("received message %q from upstream server.", response))
+		//slog.Info("received message " + response + " from upstream server.")
 		if err != nil {
 			slog.Error(err.Error(), "msg", "error while reading response from upstream server.")
 			return
 		}
 
 		clientMessage := searchAndReplaceBGAddress(response)
+		slog.Info(fmt.Sprintf("sending message %q to client.", clientMessage))
 		if _, err := clientConn.Write([]byte(clientMessage)); err != nil {
 			slog.Error(err.Error(), "msg", "error while sending response back to client.")
 			return
