@@ -74,7 +74,6 @@ func searchAndReplaceBGAddress(message string) (newMessage string) {
 	//}
 
 	newMessage = strings.Join(words, " ")
-	newMessage = newMessage + "\n"
 
 	return newMessage
 
