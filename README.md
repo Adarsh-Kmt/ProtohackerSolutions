@@ -8,7 +8,7 @@ Check out my [substack](https://adarshkmt.substack.com/), where I explain my sol
 - [X] [Means to an End](https://adarshkmt.substack.com/p/challenge-2-means-to-an-end)
 - [X] [Budget Chat](https://adarshkmt.substack.com/p/challenge-3-budget-chat)
 - [X] [Unusual Database Program](https://adarshkmt.substack.com/p/challenge-4-unusual-database-program)
-- [ ] Mob in the Middle
+- [X] [Mob in the Middle](https://adarshkmt.substack.com/p/mob-in-the-middle)
 - [ ] Speed Daemon
 - [ ] Line Reversal
 - [ ] Insecure Sockets Layer
